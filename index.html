@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#06101d" />
+    <meta name="description" content="GridWise conversational campus energy planning" />
+    <title>GridWise · AI Energy Operator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar" id="sidebar" aria-label="Primary navigation">
+        <a class="brand" href="#" aria-label="GridWise command center">
+          <span class="brand-mark"><svg viewBox="0 0 32 32"><path d="M17 2 6 17h8l-1 13 12-17h-8V2Z"/></svg></span>
+          <span><strong>GRIDWISE</strong><small>AI ENERGY OPERATOR</small></span>
+        </a>
+        <nav>
+          <button class="nav-item active" data-view="command"><span data-icon="spark"></span><span>Command center</span></button>
+          <button class="nav-item" data-view="schedule"><span data-icon="calendar"></span><span>24-hour plan</span></button>
+          <button class="nav-item" data-view="settings"><span data-icon="sliders"></span><span>Campus profile</span></button>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="campus-badge"><span data-icon="grid"></span><div><strong>North Campus</strong><small>Microgrid control</small></div></div>
+          <p>GridWise turns operator instructions into a safe, cost-optimized daily plan.</p>
+        </div>
+      </aside>
+      <div class="mobile-overlay" id="mobileOverlay"></div>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div class="topbar-title"><button class="icon-button mobile-menu" id="mobileMenu" aria-label="Open navigation"><span data-icon="menu"></span></button><div><p>SMART CAMPUS OPERATIONS</p><h1 id="pageTitle">Command center</h1></div></div>
+          <div class="topbar-actions">
+            <div class="system-status checking" id="systemStatus" role="status"><i></i><span>Connecting</span></div>
+            <button class="icon-button" id="themeToggle" aria-label="Toggle theme"><span data-icon="moon"></span></button>
+          </div>
+        </header>
+
+        <main>
+          <section class="view active" data-page="command">
+            <div class="command-layout">
+              <section class="chat-card">
+                <div class="chat-head">
+                  <div class="ai-avatar"><span data-icon="spark"></span></div>
+                  <div><h2>GridWise Assistant</h2><p><i></i> Ready to plan your campus energy day</p></div>
+                  <button class="ghost-button" id="newConversation"><span data-icon="plus"></span>New plan</button>
+                </div>
+
+                <div class="conversation" id="conversation" aria-live="polite"></div>
+
+                <div class="quick-prompts" id="quickPrompts">
+                  <button>Keep at least 100 kWh in the battery from 6 PM to 9 PM</button>
+                  <button>Do not charge between 2 PM and 4 PM</button>
+                  <button>Limit grid use to 180 kWh from 7 PM to 10 PM</button>
+                </div>
+
+                <div class="composer-wrap">
+                  <div class="note-meter"><span id="noteCount">0 of 3 instructions</span><button id="clearNotes">Clear</button></div>
+                  <div class="composer">
+                    <textarea id="chatInput" rows="1" maxlength="800" placeholder="Tell GridWise what changed today…" aria-label="Operator instruction"></textarea>
+                    <button class="send-button" id="sendCommand" aria-label="Send instruction and optimize"><span data-icon="spark"></span><span>Build plan</span></button>
+                  </div>
+                  <p class="composer-hint">Enter to send · Shift + Enter for a new line · Up to 3 instructions</p>
+                </div>
+              </section>
+
+              <aside class="context-column">
+                <article class="context-card day-context">
+                  <div class="context-head"><div><span>TODAY'S ENERGY</span><h3 id="scenarioLabel">Custom day</h3></div><button class="icon-button small" data-navigate="settings" aria-label="Edit campus profile"><span data-icon="edit"></span></button></div>
+                  <div class="mini-profile" id="miniProfile"></div>
+                  <div class="context-stats"><div><span>Demand</span><strong id="dayDemand">—</strong></div><div><span>Solar forecast</span><strong id="daySolar">—</strong></div><div><span>Battery</span><strong id="dayBattery">—</strong></div></div>
+                </article>
+                <article class="context-card readiness-card">
+                  <div class="readiness-icon"><span data-icon="check"></span></div><div><span>READY TO OPTIMIZE</span><h3>Scenario complete</h3><p>24 hourly records and battery limits are loaded.</p></div>
+                </article>
+                <article class="context-card help-card"><span data-icon="info"></span><div><h3>What can I say?</h3><p>Mention solar reductions, battery reserve, unavailable charging or discharging, or a grid-import limit with a time window.</p></div></article>
+              </aside>
+            </div>
+
+            <section class="result-section hidden" id="resultSection">
+              <div class="result-heading"><div><p class="eyebrow">OPTIMIZED DAY</p><h2>Your energy plan is ready.</h2></div><button class="secondary" data-navigate="schedule"><span data-icon="calendar"></span>View full schedule</button></div>
+              <div class="kpi-grid">
+                <article><span>Total cost</span><strong id="kpiCost">—</strong><small>BDT / day</small></article>
+                <article><span>Grid energy</span><strong id="kpiGrid">—</strong><small>kWh imported</small></article>
+                <article><span>Peak draw</span><strong id="kpiPeak">—</strong><small>kWh maximum</small></article>
+                <article><span>Final battery</span><strong id="kpiBattery">—</strong><small>kWh stored</small></article>
+              </div>
+              <div class="result-grid">
+                <article class="panel chart-panel"><div class="panel-head"><div><span>ENERGY FLOW</span><h3>Demand, solar and grid</h3></div><div class="legend"><span><i class="demand"></i>Demand</span><span><i class="solar"></i>Solar</span><span><i class="grid"></i>Grid</span></div></div><div class="chart-wrap" id="energyChart"></div><div class="chart-tooltip hidden" id="chartTooltip"></div></article>
+                <article class="panel battery-panel"><div class="panel-head"><div><span>STORAGE</span><h3>Battery at <b id="selectedHour">12:00</b></h3></div><span class="action-pill" id="batteryAction">Idle</span></div><div class="battery-content"><div class="battery"><div class="battery-cap"></div><div class="battery-body"><div class="battery-fill" id="batteryFill"></div><div class="reserve-line"></div><strong id="socPercent">—</strong></div></div><div class="battery-copy"><span>Stored energy</span><strong id="storedEnergy">—</strong><small id="batteryCapacity">of — kWh</small></div></div><div class="hour-controls"><button data-hour-step="-1">‹</button><span>Explore each hour</span><button data-hour-step="1">›</button></div></article>
+              </div>
+            </section>
+          </section>
+
+          <section class="view" data-page="schedule">
+            <div class="page-heading"><div><p class="eyebrow">24-HOUR DISPATCH</p><h2>Your optimized energy plan.</h2><p>Explore what GridWise recommends for every hour of the day.</p></div><button class="primary" data-navigate="command"><span data-icon="brain"></span>Ask GridWise</button></div>
+            <div class="empty-plan" id="emptyPlan"><span data-icon="calendar"></span><h3>No plan yet</h3><p>Talk to GridWise in the command center to create your optimized schedule.</p><button class="primary" data-navigate="command">Open command center</button></div>
+            <div id="scheduleContent" class="hidden">
+              <article class="panel timeline-panel"><div class="panel-head"><div><span>DAY AT A GLANCE</span><h3>Battery activity timeline</h3></div></div><div class="hour-timeline" id="hourTimeline"></div><div class="hour-detail" id="hourDetail"></div></article>
+              <article class="panel schedule-panel"><div class="panel-head"><div><span>HOURLY PLAN</span><h3>Complete schedule</h3></div><span class="balanced-badge"><span data-icon="check"></span>Battery balanced</span></div><div class="table-wrap"><table><thead><tr><th>Hour</th><th>Demand</th><th>Solar used</th><th>Grid</th><th>Tariff</th><th>Battery</th><th>Amount</th><th>Energy after</th></tr></thead><tbody id="scheduleBody"></tbody></table></div></article>
+            </div>
+          </section>
+
+          <section class="view" data-page="settings">
+            <div class="page-heading"><div><p class="eyebrow">CAMPUS ENERGY PROFILE</p><h2>Configure the operating day.</h2><p>Set the expected demand, available solar, electricity tariff, and battery limits for each hour. Operational instructions belong in the command center.</p></div><button class="primary" data-navigate="command"><span data-icon="spark"></span>Continue to assistant</button></div>
+            <div class="settings-grid">
+              <article class="panel form-panel"><div class="panel-head"><div><span>SCENARIO</span><h3>Campus and battery</h3></div></div><div class="form-content"><label>Scenario name<input id="scenarioId" /></label><div class="battery-form" id="batteryForm"></div></div></article>
+              <article class="panel hours-panel"><div class="panel-head"><div><span>FORECAST</span><h3>24-hour energy profile</h3></div><span>kWh · BDT/kWh</span></div><div class="table-wrap"><table><thead><tr><th>Hour</th><th>Demand</th><th>Solar</th><th>Tariff</th></tr></thead><tbody id="hoursInputBody"></tbody></table></div></article>
+            </div>
+          </section>
+        </main>
+      </section>
+    </div>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>

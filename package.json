@@ -1,0 +1,11 @@
+{
+  "name": "gridwise-control-center",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production UI client for the GridWise smart-campus energy optimizer",
+  "scripts": {
+    "dev": "node dev-server.mjs",
+    "backend": ".venv\\Scripts\\python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "check": "node --check src/app.js && node --check src/charts.js && node --check src/ui.js"
+  }
+}
